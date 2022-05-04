@@ -24,14 +24,25 @@ class TaskSchema(ma.Schema):
     class Meta:
         fields = ('id', 'title', 'description')
 
-
 task_schema = TaskSchema()
 tasks_schema = TaskSchema(many=True)
 
 @app.route('/tasks', methods=['POST'])
 def createTask():
-    print(request.json)
-    return 'received'
+    title = request.json['title']
+    description = request.json['description']
+    new_task = Task(title, description)
+    #Save data in the db
+    db.session.add(new_task)
+    #end the operation
+    db.session.commit()
+    return task_schema.jsonify(new_task)
+
+@app.route('/tasks', methods=['GET'])
+def getTasks():
+    all_tasks = Task.query.all()
+    result = tasks_schema.dump(all_tasks)
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(debug=True)
