@@ -27,6 +27,10 @@ class TaskSchema(ma.Schema):
 task_schema = TaskSchema()
 tasks_schema = TaskSchema(many=True)
 
+@app.route('/')
+def index():
+    return jsonify({"message": "Welcome to the API"})
+
 @app.route('/tasks', methods=['POST'])
 def createTask():
     title = request.json['title']
@@ -62,10 +66,7 @@ def updateTask(id):
 @app.route('/tasks/<id>', methods=['DELETE'])
 def deleteTask(id):
     task = Task.query.get(id)
-    title = request.json['title']
-    description = request.json['description']
-    task.title = title
-    task.description = description
+    db.session.delete(task)
     db.session.commit()
     return task_schema.jsonify(task)
 
